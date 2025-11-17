@@ -1,0 +1,173 @@
+/* ============================================
+   METRO LOGIN & REGISTER STYLE
+   ============================================ */
+
+   .auth-page {
+    position: relative;
+    min-height: 100vh;
+    background: url('https://cdn-media.sforum.vn/storage/app/media/phuong.anh/huong-dan-mua-ve-tuyen-metro-so-1-tphcm/huong-dan-mua-ve-tuyen-metro-so-1-tphcm-bg.jpg')
+      no-repeat center center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .auth-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    z-index: 1;
+  }
+  
+  .auth-card {
+    position: relative;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.8s ease;
+  }
+  
+  .auth-header h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  
+  .auth-header p {
+    color: #ddd;
+    margin-bottom: 25px;
+  }
+  
+  .form-group {
+    text-align: left;
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    font-size: 14px;
+    display: block;
+    margin-bottom: 6px;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 5px;
+    background: rgb(193, 180, 180);
+    color: white;
+    outline: none;
+    transition: 0.3s;
+  }
+  
+  .form-group input:focus {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  
+  .form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+  
+  .form-options a {
+    color: #ff4081;
+    text-decoration: none;
+  }
+  
+  .btn-login {
+    width: 100%;
+    padding: 10px;
+    background: #ff4081;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .btn-login:hover {
+    background: #e53770;
+  }
+  
+  .divider {
+    margin: 20px 0;
+    color: #ddd;
+    font-weight: 500;
+  }
+  
+  .social-login {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .facebook-btn {
+    background: #3b5998;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .twitter-btn {
+    background: #55acee;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .auth-footer p {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #ddd;
+  }
+  
+  .auth-footer a {
+    color: #ff4081;
+    text-decoration: none;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .back-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 16px;
+    background-color: #3498db;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.back-button:hover {
+    background-color: #2980b9;
+}

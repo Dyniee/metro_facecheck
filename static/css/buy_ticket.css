@@ -1,0 +1,279 @@
+/* ============================================
+   BUY TICKET PAGE SPECIFIC STYLES
+   ============================================ */
+
+.ticket-form-container {
+    max-width: 700px; /* Tăng độ rộng để chứa tab */
+    margin: 0 auto;
+}
+
+.ticket-form {
+    background: var(--white);
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-md);
+}
+
+/* === SỐ DƯ VÍ === */
+.wallet-balance-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--white);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-xl);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+.balance-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+.btn-top-up {
+    background: var(--white);
+    color: var(--primary);
+    text-decoration: none;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+.btn-top-up:hover {
+    background: var(--gray-light);
+}
+
+/* === ✨ GIAI ĐOẠN 3: CSS GỢI Ý THÓI QUEN ✨ === */
+.habit-suggestion-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+    animation: fadeIn 0.5s ease-out;
+    flex-wrap: wrap; /* Cho responsive */
+}
+.habit-icon {
+    font-size: 2rem;
+    margin-right: var(--spacing-lg);
+}
+.habit-content {
+    flex: 1;
+    min-width: 200px; /* Tránh bị vỡ layout */
+}
+.habit-content p {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin: 0;
+}
+.habit-content strong {
+    font-size: 1.1rem;
+    color: var(--primary-dark);
+}
+.btn-apply-habit {
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 5px; /* Thêm margin cho responsive */
+}
+.btn-apply-habit:hover {
+    background: var(--primary-dark);
+}
+/* === ✨ HẾT GIAI ĐOẠN 3 ✨ === */
+
+
+/* === GIAO DIỆN TAB === */
+.ticket-tabs {
+    display: flex;
+    gap: var(--spacing-sm);
+    background-color: var(--gray-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-xl);
+}
+.tab-btn {
+    flex: 1;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+}
+.tab-btn:hover {
+    background: #e0e0e0;
+}
+.tab-btn.active {
+    background: var(--white);
+    color: var(--primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.tab-content {
+    display: none;
+    animation: fadeIn 0.5s;
+}
+.tab-content.active {
+    display: block;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* === CÁC PHẦN FORM === */
+.form-section {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+    border-bottom: 1px solid var(--gray-light);
+}
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.form-section h3 {
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-lg);
+    color: var(--dark);
+}
+
+/* === HIỂN THỊ GIÁ VÉ LƯỢT === */
+.price-display-box {
+    text-align: center;
+    background: var(--primary-light);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+}
+.price-display {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+.price-error-message {
+    color: var(--error);
+    font-size: 0.9rem;
+    margin-top: var(--spacing-sm);
+    height: 1rem; /* Dành chỗ cho thông báo lỗi */
+}
+
+/* === THÔNG TIN VÉ THÁNG (Đã sửa lại) === */
+.ticket-info-box {
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    border-left: 5px solid;
+}
+.ticket-info-box.general {
+    background: #f5f5f5;
+    border-color: var(--primary);
+}
+.ticket-info-box.student {
+    background: var(--secondary-light);
+    border-color: var(--secondary-dark);
+}
+.ticket-info-box h4 {
+    margin-top: 0;
+    margin-bottom: var(--spacing-sm);
+    font-size: 1.1rem;
+}
+.ticket-info-box.general h4 {
+    color: var(--primary);
+}
+.ticket-info-box.student h4 {
+    color: var(--secondary-dark);
+}
+
+.ticket-info-box p {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* === CSS CHO GỢI Ý (AI) LỊCH TÀU === */
+.suggestion-box {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    margin-top: var(--spacing-lg);
+    font-weight: 500;
+    font-size: 0.95rem;
+    border: 1px solid;
+}
+#suggestion-icon {
+    font-size: 1.5rem;
+}
+/* Giờ cao điểm */
+.suggestion-box.high-traffic {
+    background-color: #fff8e1; /* Vàng nhạt */
+    border-color: #ffc107;
+    color: #856404;
+}
+/* Giờ bình thường */
+.suggestion-box.normal-traffic {
+    background-color: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary-dark);
+}
+/* Giờ thấp điểm */
+.suggestion-box.low-traffic {
+    background-color: var(--secondary-light);
+    border-color: var(--secondary);
+    color: var(--secondary-dark);
+}
+.suggestion-box.error {
+    background-color: #fbeae5;
+    border-color: var(--error);
+    color: var(--error);
+}
+
+
+/* === RESPONSIVE DESIGN === */
+@media (max-width: 768px) {
+    .ticket-form {
+        padding: var(--spacing-lg);
+    }
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    .wallet-balance-box {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-lg);
+    }
+}
+@media (max-width: 480px) {
+    .ticket-form {
+        padding: var(--spacing-md);
+    }
+    .ticket-info-box {
+        padding: 1rem;
+    }
+    .ticket-tabs {
+        flex-direction: column;
+    }
+    .price-display {
+        font-size: 2rem;
+    }
+}

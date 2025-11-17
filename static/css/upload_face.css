@@ -1,0 +1,120 @@
+.upload-container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: var(--card-bg);
+    padding: 2.5rem 3rem;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+}
+
+.upload-tabs {
+    display: flex;
+    margin-bottom: 2rem;
+    border-radius: var(--radius-sm);
+    background: var(--bg-color);
+    padding: 0.25rem;
+}
+.upload-tab {
+    flex: 1;
+    padding: 0.85rem 1rem;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.upload-tab.active {
+    background: var(--card-bg);
+    color: var(--primary-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.upload-tab-content {
+    display: none;
+}
+.upload-tab-content.active {
+    display: block;
+}
+
+.upload-area {
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 3rem 2rem;
+    text-align: center;
+    background-color: var(--bg-color);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.upload-area:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
+}
+.upload-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+.upload-label {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    background: var(--primary-color);
+    color: white;
+    border-radius: var(--radius-sm);
+    margin-top: 1rem;
+    cursor: pointer;
+}
+#face-input {
+    display: none;
+}
+
+.upload-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+#preview-img, #camera-img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--border-color);
+}
+
+.camera-container {
+    position: relative;
+    width: 100%;
+    padding-top: 75%; /* Tỷ lệ 4:3 */
+    background: #000;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+#camera-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.camera-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+.camera-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+.camera-btn-start { background-color: var(--success-color); color: white; }
+.camera-btn-capture { background-color: var(--primary-color); color: white; }
+.camera-btn-stop { background-color: var(--danger-color); color: white; }

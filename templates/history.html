@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">{% endblock %}
+
+{% block title %}Lịch Sử Vé - Metro FaceCheck{% endblock %}
+
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h2>Lịch Sử Vé Của Bạn</h2>
+        <p>Xem tất cả các vé đã mua</p>
+    </div>
+
+
+    {% if tickets %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID Vé</th>
+                        <th>Loại Vé</th>
+                        <th>Chi Tiết (Từ → Đến)</th>
+                        <th>Giá Vé</th>
+                        <th>Hiệu Lực (Ngày/Giờ)</th> <th>Trạng Thái</th>
+                        <th>Ngày Mua</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                        <tr>
+                            <td>{{ ticket.id }}</td>
+                            <td>
+                                {% if ticket.ticket_type == 'monthly' %}
+                                    <span class="badge badge-primary">Vé Tháng</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">Vé Lượt</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if ticket.ticket_type == 'single' %}
+                                    {{ ticket.from_station_name or '-' }} → {{ ticket.to_station_name or '-' }}
+                                {% else %}
+                                    (Tất cả các tuyến)
+                                {% endif %}
+                            </td>
+                            <td class="ticket-price">
+                                {{ "{:,.0f} VNĐ".format(ticket.purchase_price) if ticket.purchase_price is not none else 'N/A' }}
+                            </td>
+                            
+                            <td>
+                                {% if ticket.ticket_type == 'monthly' %}
+                                    30 ngày (từ {{ ticket.valid_from.strftime('%d/%m/%Y') if ticket.valid_from else '-' }})
+                                {% else %}
+                                    <strong>{{ ticket.expected_departure_time.strftime('%H:%M') if ticket.expected_departure_time else 'N/A' }}</strong>
+                                    <br>
+                                    <span style="font-size: 0.9em; color: #666;">
+                                        {{ ticket.valid_from.strftime('%d/%m/%Y') if ticket.valid_from else '-' }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                            
+                            <td>
+                                {% if ticket.status == 'NEW' and ticket.used == 0 %}
+                                    <span class="badge badge-primary">Mới</span>
+                                {% elif ticket.status == 'USED' or ticket.used == 1 %}
+                                    <span class="badge badge-success">Đã Dùng</span>
+                                {% else %}
+                                    <span class="badge badge-warning">{{ ticket.status or 'Hết hạn' }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ ticket.purchase_time.strftime('%d/%m/%Y %H:%M') if ticket.purchase_time else '-' }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h3>Chưa Có Vé Nào</h3>
+            <p>Hãy mua vé đầu tiên của bạn để bắt đầu sử dụng dịch vụ.</p>
+            <a href="/buy_ticket" class="btn btn-primary btn-lg">Mua Vé Ngay</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

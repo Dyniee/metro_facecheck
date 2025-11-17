@@ -1,0 +1,82 @@
+/* ============================================
+   WALLET PAGE STYLES
+   ============================================ */
+
+.wallet-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: var(--spacing-xl);
+}
+
+.wallet-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.balance-card,
+.top-up-card {
+    background: var(--white);
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+}
+
+.balance-label {
+    font-size: 1rem;
+    color: var(--gray);
+    margin-bottom: var(--spacing-sm);
+}
+
+.balance-amount {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.balance-note {
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+.top-up-card h4 {
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.top-up-card p {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: var(--spacing-lg);
+}
+
+.transaction-main h3 {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--gray-light);
+    padding-bottom: var(--spacing-md);
+}
+
+.data-table .amount {
+    font-weight: 700;
+}
+
+.data-table .amount-top-up {
+    color: var(--success);
+}
+
+.data-table .amount-purchase {
+    color: var(--error);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 992px) {
+    .wallet-layout {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,251 @@
+/* ============================================
+   METRO CHECK-IN INTERFACE (FULL SCREEN)
+   ============================================ */
+   :root {
+    --metro-blue: #007bff;
+    --blue-light: #6ec9ff;
+    --green-pass: #00ffa3;
+    --red-deny: #ff3b30;
+    --text-light: #ffffff;
+    --text-dark: #003a99;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.25);
+    --radius-lg: 18px;
+    --radius-md: 10px;
+  }
+  
+  /* ========== Reset & Base ========== */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", "Poppins", sans-serif;
+  }
+  
+  body {
+    background: linear-gradient(135deg, var(--metro-blue), var(--blue-light));
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-light);
+    overflow: hidden;
+  }
+  
+  /* ========== Check-in Wrapper (Full Screen) ========== */
+  .checkin-page-wrapper {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15), rgba(0,0,0,0.2));
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+  }
+  
+  /* ========== Container Card (Glass Effect) ========== */
+  .checkin-container {
+    width: 95%;
+    max-width: 1200px;
+    background: var(--glass-bg);
+    border: 1.5px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: flex;
+    gap: 40px;
+    padding: 40px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
+    animation: fadeIn 0.8s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* ========== Camera Box ========== */
+  .camera-box {
+    flex: 1;
+    position: relative;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--glass-border);
+    overflow: hidden;
+    aspect-ratio: 4/3;
+    background: rgba(0,0,0,0.3);
+  }
+  
+  .camera-box video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    border-radius: var(--radius-md);
+  }
+  
+  #camera-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  #camera-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .overlay-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    background: rgba(0,0,0,0.6);
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-md);
+    box-shadow: 0 0 10px rgba(255,255,255,0.2);
+  }
+  
+  /* ========== Info Box ========== */
+  .info-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: var(--text-light);
+  }
+  
+  .info-box h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 0 8px rgba(255,255,255,0.2);
+    margin-bottom: 10px;
+  }
+  
+  .info-box p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 20px;
+  }
+  
+  /* ========== Status Box ========== */
+  .status-box {
+    margin: 20px 0;
+    padding: 18px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1.5px solid var(--glass-border);
+    background: rgba(255,255,255,0.08);
+    transition: all 0.4s ease;
+  }
+  
+  .status-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .status-icon svg {
+    width: 32px;
+    height: 32px;
+    stroke-width: 2.5;
+  }
+  
+  .status-text h4 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 3px;
+  }
+  
+  .status-text p {
+    font-size: 0.9rem;
+    opacity: 0.85;
+    color: #eaeaea;
+  }
+  
+  /* === Status Colors === */
+  .status-idle { border-color: var(--glass-border); }
+  .status-checking { border-color: #f0ad4e; background: rgba(240,173,78,0.12); }
+  .status-pass { border-color: var(--green-pass); background: rgba(0,255,163,0.15); }
+  .status-deny { border-color: var(--red-deny); background: rgba(255,59,48,0.15); }
+  
+  /* ========== Dropdown ========== */
+  .station-select {
+    width: 100%;
+    padding: 14px 15px;
+    margin: 1rem 0 1.5rem;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--glass-border);
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+  }
+  .station-select option {
+    background: var(--metro-blue);
+    color: #fff;
+  }
+  
+  /* ========== Button ========== */
+  .btn-modern {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    background: var(--green-pass);
+    color: var(--text-dark);
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+  .btn-modern:hover {
+    background: #6bffcf;
+    box-shadow: 0 8px 25px rgba(0,255,163,0.25);
+    transform: translateY(-3px);
+  }
+  .btn-modern:disabled {
+    background: #666;
+    color: #bbb;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  /* ========== Spinner Animation ========== */
+  .icon-spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0, 0, 0, 0.2);
+    border-top-color: var(--text-dark);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin { to { transform: rotate(360deg); } }
+  
+  /* ========== Responsive ========== */
+  @media (max-width: 950px) {
+    .checkin-container {
+      flex-direction: column;
+      padding: 25px;
+    }
+    .camera-box { aspect-ratio: 1/1; }
+    .info-box h2 { font-size: 1.8rem; }
+  }
+  

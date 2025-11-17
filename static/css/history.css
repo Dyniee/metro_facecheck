@@ -1,0 +1,104 @@
+/* ============================================
+   HISTORY PAGE SPECIFIC STYLES
+   ============================================ */
+
+.history-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.trip-code {
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+/* ============================================
+   TABLE ENHANCEMENTS (ĐÃ CẬP NHẬT)
+   ============================================ */
+
+.data-table th:nth-child(1) { width: 5%; }  /* ID Vé */
+.data-table th:nth-child(2) { width: 10%; } /* Loại Vé */
+.data-table th:nth-child(3) { width: 15%; } /* Mã Vé */
+.data-table th:nth-child(4) { width: 25%; } /* Chi Tiết */
+.data-table th:nth-child(5) { width: 15%; } /* GIÁ VÉ (MỚI) */
+.data-table th:nth-child(6) { width: 10%; } /* Hiệu Lực */
+.data-table th:nth-child(7) { width: 10%; } /* Trạng Thái */
+.data-table th:nth-child(8) { width: 10%; } /* Ngày Mua */
+
+/* MỚI: Định dạng cột giá vé */
+.ticket-price {
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+/* ============================================
+   STATUS BADGES
+   ============================================ */
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-new {
+    background-color: rgba(0, 102, 204, 0.1);
+    color: var(--primary);
+}
+
+.status-used {
+    background-color: rgba(0, 204, 102, 0.1);
+    color: var(--success);
+}
+
+.status-expired {
+    background-color: rgba(255, 170, 0, 0.1);
+    color: var(--warning);
+}
+
+/* ============================================
+   RESPONSIVE TABLE (ĐÃ CẬP NHẬT)
+   ============================================ */
+
+@media (max-width: 768px) {
+    .table-container {
+        font-size: 0.85rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 0.75rem;
+    }
+    
+    /* Ẩn ID (1), Hiệu lực (6), Ngày mua (8) */
+    .data-table th:nth-child(1),
+    .data-table th:nth-child(6),
+    .data-table th:nth-child(8) {
+        display: none;
+    }
+    
+    .data-table td:nth-child(1),
+    .data-table td:nth-child(6),
+    .data-table td:nth-child(8) {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .table-container {
+        font-size: 0.8rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 0.5rem;
+    }
+    
+    .trip-code {
+        font-size: 0.75rem;
+    }
+}

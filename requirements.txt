@@ -1,0 +1,8 @@
+Flask
+flask_cors
+mysql-connector-python
+opencv-python
+face_recognition
+numpy
+Werkzeug
+mediapipe

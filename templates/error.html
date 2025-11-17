@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-container">
+    <div class="error-container">
+        <div class="error-icon">⛔</div>
+        <h2>Lỗi Truy Cập</h2>
+        <p>{{ error }}</p>
+        <a href="/" class="btn btn-primary">Quay Lại Trang Chủ</a>
+    </div>
+</div>
+
+
+<style>
+.error-container {
+    text-align: center;
+    padding: 3rem 1rem;
+    max-width: 500px;
+    margin: 2rem auto;
+}
+
+
+.error-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+
+.error-container h2 {
+    color: #dc3545;
+    margin-bottom: 1rem;
+}
+
+
+.error-container p {
+    color: #666;
+    margin-bottom: 2rem;
+}
+</style>
+{% endblock %}
+
+
+
+
+
+

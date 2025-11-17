@@ -1,0 +1,389 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/buy_ticket.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+
+{% block title %}Mua Vé - Metro FaceCheck{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h2>Mua Vé Metro</h2>
+        <p>Chọn loại vé và thanh toán bằng số dư của bạn</p>
+    </div>
+
+    <div class="ticket-form-container">
+        
+        <div class="wallet-balance-box">
+            <span>Số Dư Ví</span>
+            <span class="balance-amount">{{ "{:,.0f} VNĐ".format(balance) }}</span>
+            <a href="{{ url_for('wallet_page') }}" class="btn-top-up">Nạp Tiền</a>
+        </div>
+        
+        <div id="habit-suggestion-box" class="habit-suggestion-box" style="display: none;">
+            <span class="habit-icon">👋</span>
+            <div class="habit-content">
+                <p>Mua vé quen thuộc?</p>
+                <strong id="habit-details">Ga Bến Thành → Ga Thủ Đức (khoảng 8:00)</strong>
+            </div>
+            <button type="button" id="apply-habit-btn" class="btn-apply-habit">Chọn Nhanh</button>
+        </div>
+        {% if error %}
+            <div class="alert alert-error" style="margin-bottom: 1.5rem;">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        {% if has_active and not has_face %}
+            <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+                Bạn đã có vé tháng nhưng chưa đăng ký khuôn mặt. Vui lòng đăng ký khuôn mặt để kích hoạt vé.
+            </div>
+            <a href="{{ url_for('upload_face_page') }}" class="btn btn-primary btn-lg btn-block" style="margin-bottom:1rem;">Đăng Ký Khuôn Mặt</a>
+        {% endif %}
+
+        <div class="ticket-form">
+            <div class="ticket-tabs">
+                <button type="button" class="tab-btn active" data-tab="single">
+                    <span class="tab-icon">🎟️</span> Mua Vé Lượt
+                </button>
+                <button type="button" class="tab-btn" data-tab="monthly">
+                    <span class="tab-icon">📅</span> Mua Vé Tháng
+                </button>
+            </div>
+
+            <form method="POST" id="buy-ticket-form">
+                <input type="hidden" id="ticket_type_input" name="ticket_type" value="single">
+
+                <div id="single" class="tab-content active">
+                    <div class="form-section">
+                        <h3>Bước 1: Chọn Ga Đi và Đến</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="from_station">Ga Đi</label>
+                                <select id="from_station" name="from_station" required>
+                                    <option value="">-- Chọn ga đi --</option>
+                                    {% for station in stations %}
+                                        <option value="{{ station.station_name }}">{{ station.station_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="to_station">Ga Đến</label>
+                                <select id="to_station" name="to_station" required>
+                                    <option value="">-- Chọn ga đến --</option>
+                                    {% for station in stations %}
+                                        <option value="{{ station.station_name }}">{{ station.station_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Bước 2: Chọn Thời Gian Đi</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="valid_date">Chọn Ngày Đi</label>
+                                <input type="text" id="valid_date" name="valid_date" required placeholder="Chọn ngày...">
+                            </div>
+                            <div class="form-group">
+                                <label for="departure_time">Giờ Dự Kiến (5:00 - 23:30)</label>
+                                <input type="text" id="departure_time" name="departure_time" required placeholder="Chọn giờ...">
+                            </div>
+                        </div>
+                        
+                        <div id="suggestion-box" class="suggestion-box" style="display: none;">
+                            <span id="suggestion-icon"></span>
+                            <span id="suggestion-text"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-section price-display-box">
+                        <h3>Giá Vé Lượt</h3>
+                        <div class="price-display">
+                            <span id="single-ticket-price">0</span> VNĐ
+                        </div>
+                        <p id="price-error" class="price-error-message"></p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">
+                        Thanh Toán Vé Lượt
+                    </button>
+                </div>
+
+                <div id="monthly" class="tab-content">
+                    <div class="form-section">
+                        <h3>Vé Tháng - 30 Ngày</h3>
+                        
+                        {% if user_type == 'student' %}
+                            <div class="ticket-info-box student">
+                                <h4>Gói Học sinh/Sinh viên</h4>
+                                <p>Giá ưu đãi: <strong>150,000 VNĐ</strong></p>
+                            </div>
+                        {% else %}
+                            <div class="ticket-info-box general">
+                                <h4>Gói Phổ thông</h4>
+                                <p>Giá vé: <strong>300,000 VNĐ</strong></p>
+                            </div>
+                        {% endif %}
+                        
+                        <p style="color: #666; font-size: 0.95rem; line-height: 1.6;">
+                            ✓ Sử dụng không giới hạn trong 30 ngày<br>
+                            ✓ Hỗ trợ đi qua tất cả {{ stations|length }} ga metro<br>
+                            ✓ Chỉ cần đăng ký khuôn mặt một lần<br>
+                        </p>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Chọn Ga Mặc Định</h3>
+                        <p style="color: #666; margin-bottom: 1rem;">
+                            (Vé tháng cho phép đi tất cả các ga, đây chỉ là ga đi/đến bạn thường dùng)
+                        </p>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="monthly_from_station">Ga Đi (thường vào)</label>
+                                <select id="monthly_from_station" name="station_from_id" required>
+                                    <option value="">-- Chọn ga đi --</option>
+                                    {% for station in stations %}
+                                        <option value="{{ station.station_name }}">{{ station.station_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="monthly_to_station">Ga Đến (thường đến)</label>
+                                <select id="monthly_to_station" name="station_to_id" required>
+                                    <option value="">-- Chọn ga đến --</option>
+                                    {% for station in stations %}
+                                        <option value="{{ station.station_name }}">{{ station.station_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg btn-block" style="margin-top: 2rem;">
+                        Thanh Toán Vé Tháng
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // === KHỞI TẠO LỊCH/GIỜ ===
+        const datePicker = flatpickr("#valid_date", {
+            minDate: "today",
+            dateFormat: "Y-m-d",
+            defaultDate: "today",
+            onChange: function(selectedDates, dateStr, instance) {
+                fetchTravelSuggestion(); 
+            }
+        });
+        
+        const timePicker = flatpickr("#departure_time", {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: "H:i",
+            defaultDate: "09:00",
+            minTime: "05:00",
+            maxTime: "23:30",
+            time_24hr: true,
+            onChange: function(selectedDates, dateStr, instance) {
+                fetchTravelSuggestion(); 
+            }
+        });
+        
+        // === LOGIC CHUYỂN TAB ===
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const hiddenTicketType = document.getElementById('ticket_type_input');
+        const form = document.getElementById('buy-ticket-form');
+        
+        const singleInputs = {
+            from: document.getElementById('from_station'),
+            to: document.getElementById('to_station'),
+            date: datePicker.input,
+            time: timePicker.input
+        };
+        
+        const monthlyInputs = {
+            from: document.getElementById('monthly_from_station'),
+            to: document.getElementById('monthly_to_station')
+        };
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                button.classList.add('active');
+                const tabId = button.dataset.tab;
+                document.getElementById(tabId).classList.add('active');
+                hiddenTicketType.value = tabId;
+                
+                if (tabId === 'single') {
+                    setRequired(singleInputs, true);
+                    setRequired(monthlyInputs, false);
+                } else {
+                    setRequired(singleInputs, false);
+                    setRequired(monthlyInputs, true);
+                }
+            });
+        });
+        
+        function setRequired(inputs, isRequired) {
+            for (const key in inputs) {
+                if (isRequired) {
+                    inputs[key].setAttribute('required', 'required');
+                } else {
+                    inputs[key].removeAttribute('required');
+                }
+            }
+        }
+        
+        setRequired(singleInputs, true);
+        setRequired(monthlyInputs, false);
+
+        // === LOGIC TÍNH GIÁ VÉ LƯỢT ===
+        const fromStation = document.getElementById('from_station');
+        const toStation = document.getElementById('to_station');
+        const priceDisplay = document.getElementById('single-ticket-price');
+        const priceError = document.getElementById('price-error');
+
+        async function fetchTicketPrice() {
+            const from = fromStation.value;
+            const to = toStation.value;
+            if (!from || !to) { priceDisplay.textContent = '...'; priceError.textContent = ''; return; }
+            if (from === to) { priceDisplay.textContent = '0'; priceError.textContent = 'Vui lòng chọn ga đi và ga đến khác nhau.'; return; }
+            priceError.textContent = ''; priceDisplay.textContent = '...';
+            try {
+                const response = await fetch('/api/calculate_price', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ from_station: from, to_station: to })
+                });
+                if (!response.ok) { throw new Error('Lỗi máy chủ'); }
+                const result = await response.json();
+                if (result.success) {
+                    priceDisplay.textContent = result.price.toLocaleString('vi-VN');
+                } else {
+                    priceError.textContent = result.error; priceDisplay.textContent = 'Lỗi';
+                }
+            } catch (error) {
+                priceError.textContent = 'Không thể kết nối máy chủ.'; priceDisplay.textContent = 'Lỗi';
+            }
+        }
+        fromStation.addEventListener('change', fetchTicketPrice);
+        toStation.addEventListener('change', fetchTicketPrice);
+
+        // === LOGIC GỢI Ý (AI) LỊCH TÀU ===
+        const suggestionBox = document.getElementById('suggestion-box');
+        const suggestionIcon = document.getElementById('suggestion-icon');
+        const suggestionText = document.getElementById('suggestion-text');
+
+        async function fetchTravelSuggestion() {
+            const date = datePicker.input.value;
+            const time = timePicker.input.value;
+            if (!date || !time) return;
+            try {
+                suggestionBox.style.display = 'flex';
+                suggestionIcon.textContent = '⏳';
+                suggestionText.textContent = 'Đang phân tích lịch tàu...';
+                const response = await fetch('/api/get_travel_suggestion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date: date, time: time })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    suggestionText.textContent = result.suggestion;
+                    if (result.frequency <= 8) { 
+                        suggestionIcon.textContent = '🔥'; 
+                        suggestionBox.className = 'suggestion-box high-traffic';
+                    } else if (result.frequency == 10) { 
+                        suggestionIcon.textContent = '👍'; 
+                        suggestionBox.className = 'suggestion-box normal-traffic';
+                    } else { 
+                        suggestionIcon.textContent = '✅'; 
+                        suggestionBox.className = 'suggestion-box low-traffic';
+                    }
+                } else { throw new Error(result.error); }
+            } catch (error) {
+                suggestionIcon.textContent = '❌';
+                suggestionText.textContent = 'Không thể tải gợi ý: ' + error.message;
+                suggestionBox.className = 'suggestion-box error';
+            }
+        }
+        fetchTravelSuggestion(); // Gọi lần đầu
+        
+        
+        // === ✨ GIAI ĐOẠN 3: HÀM GỌI API GỢI Ý THÓI QUEN (MỚI) ✨ ===
+        const habitBox = document.getElementById('habit-suggestion-box');
+        const habitDetails = document.getElementById('habit-details');
+        const applyHabitBtn = document.getElementById('apply-habit-btn');
+        
+        async function fetchUserHabit() {
+            try {
+                const response = await fetch('/api/get_user_habits'); //
+                const result = await response.json();
+
+                if (result.success && result.habit) {
+                    const habit = result.habit;
+                    // Hiển thị text
+                    habitDetails.textContent = `${habit.from_station_name} → ${habit.to_station_name} (khoảng ${habit.habit_hour}:00)`;
+                    habitBox.style.display = 'flex';
+
+                    // Lưu trữ dữ liệu thói quen vào nút
+                    applyHabitBtn.dataset.from = habit.from_station_name;
+                    applyHabitBtn.dataset.to = habit.to_station_name;
+                    applyHabitBtn.dataset.hour = habit.habit_hour;
+                } else {
+                    habitBox.style.display = 'none'; // Ẩn nếu không có thói quen
+                }
+            } catch (error) {
+                console.error("Lỗi tải thói quen:", error);
+                habitBox.style.display = 'none';
+            }
+        }
+
+        // Gắn sự kiện click cho nút "Chọn Nhanh"
+        applyHabitBtn.addEventListener('click', function() {
+            const data = this.dataset;
+            
+            // 1. Tự động điền form
+            singleInputs.from.value = data.from;
+            singleInputs.to.value = data.to;
+            
+            // 2. Set giờ (ví dụ: 8:00)
+            timePicker.setDate(data.hour + ':00', true); // 'true' để trigger event
+            
+            // 3. Set ngày là hôm nay (mặc định)
+            datePicker.setDate(new Date(), true); // 'true' để trigger event
+
+            // 4. (Quan trọng) Trigger các hàm API để cập nhật giá và gợi ý lịch tàu
+            // (Chúng ta trigger sự kiện 'change' thủ công)
+            singleInputs.from.dispatchEvent(new Event('change'));
+            singleInputs.to.dispatchEvent(new Event('change'));
+            
+            // 5. Chuyển sang tab vé lượt (nếu đang ở tab vé tháng)
+            document.querySelector('.tab-btn[data-tab="single"]').click();
+            
+            // 6. Cuộn xuống form
+            singleInputs.from.focus();
+        });
+
+        // Gọi hàm khi tải trang
+        fetchUserHabit();
+        // === ✨ HẾT GIAI ĐOẠN 3 ✨ ===
+        
+    });
+</script>
+{% endblock %}

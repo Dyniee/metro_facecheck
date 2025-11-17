@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/wallet.css') }}">{% endblock %}
+
+{% block title %}Ví Của Bạn - Metro FaceCheck{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h2>Ví & Lịch Sử Giao Dịch</h2>
+        <p>Quản lý số dư và xem các giao dịch của bạn</p>
+    </div>
+
+    <div class="wallet-layout">
+        
+        <div class="wallet-sidebar">
+            <div class="balance-card">
+                <p class="balance-label">Số Dư Hiện Tại</p>
+                <h3 id="current-balance" class="balance-amount">{{ "{:,.0f} VNĐ".format(balance) }}</h3>
+                <p class="balance-note">Sử dụng để mua vé lượt và vé tháng.</p>
+            </div>
+            
+            <div class="top-up-card">
+                <h4>Nạp Tiền Vào Ví</h4>
+                <p>Mô phỏng nạp tiền. Nhấn để nạp 100.000 VNĐ (giá trị mặc định từ API).</p>
+                <button id="top-up-btn" class="btn btn-primary btn-lg btn-block">Nạp 100.000 VNĐ</button>
+            </div>
+        </div>
+        
+        <div class="transaction-main">
+            <h3>Lịch Sử Giao Dịch</h3>
+            
+            {% if transactions %}
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Thời Gian</th>
+                            <th>Loại</th>
+                            <th>Chi Tiết</th>
+                            <th>Số Tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in transactions %}
+                        <tr>
+                            <td>{{ tx.transaction_time.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                {% if tx.type == 'top-up' %}
+                                    <span class="badge badge-success">Nạp tiền</span>
+                                {% else %}
+                                    <span class="badge badge-warning">Mua vé</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if tx.type == 'top-up' %}
+                                    Nạp tiền vào ví
+                                {% elif tx.ticket_type == 'monthly' %}
+                                    Mua <strong>Vé Tháng</strong>
+                                {% elif tx.ticket_type == 'single' %}
+                                    Mua <strong>Vé Lượt</strong> ({{ tx.from_station_name }} → {{ tx.to_station_name }})
+                                {% else %}
+                                    Thanh toán
+                                {% endif %}
+                            </td>
+                            <td class="amount {{ 'amount-top-up' if tx.amount > 0 else 'amount-purchase' }}">
+                                {{ "{:,.0f} VNĐ".format(tx.amount) }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📝</div>
+                <h3>Chưa có giao dịch</h3>
+                <p>Các giao dịch nạp tiền và mua vé sẽ xuất hiện ở đây.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('top-up-btn').addEventListener('click', async function() {
+        const btn = this;
+        const originalText = btn.innerHTML;
+        
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Đang xử lý...';
+        
+        try {
+            // Gọi API /api/wallet/topup từ app.py
+            const response = await fetch('/api/wallet/topup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: 100000 }) // Nạp 100k
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Cập nhật số dư trên giao diện
+                const balanceEl = document.getElementById('current-balance');
+                balanceEl.innerText = result.new_balance.toLocaleString('vi-VN') + ' VNĐ';
+                
+                alert('Nạp tiền thành công!');
+                // Tải lại trang để cập nhật lịch sử
+                window.location.reload(); 
+            } else {
+                throw new Error(result.error || 'Lỗi không xác định');
+            }
+            
+        } catch (error) {
+            alert('Lỗi khi nạp tiền: ' + error.message);
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    });
+
+    // Thêm CSS cho spinner (vì không có file CSS riêng)
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

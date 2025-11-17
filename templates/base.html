@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Metro FaceCheck{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='unnamed.jpg') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🚇</span>
+                    <span class="logo-text">Metro FaceCheck</span>
+                </a>
+            </div>
+            <div class="navbar-menu">
+                {% if session.get('user') %}
+                    <div class="user-menu">
+                        <span class="user-greeting">Xin chào, {{ session['user']['username'] }}</span>
+                        {% if session['user']['role'] == 'admin' %}
+                            <a href="/admin" class="nav-link admin-link">Admin</a>
+                        {% else %}
+                            <a href="{{ url_for('notifications_page') }}" class="nav-link notification-link">🔔 Thông báo</a>
+                            <a href="{{ url_for('wallet_page') }}" class="nav-link wallet-link">
+                                💰 Ví ({{ "{:,.0f} VNĐ".format(session['user']['balance'] or 0) }})
+                            </a>
+                            <a href="/buy_ticket" class="nav-link">Mua Vé</a>
+                            <a href="/history" class="nav-link">Lịch Sử</a>
+                        {% endif %}
+                        <a href="/logout" class="nav-link logout-link">Đăng Xuất</a>
+                    </div>
+                {% else %}
+                    <div class="auth-menu">
+                        <a href="/login" class="nav-link">Đăng Nhập</a>
+                        <a href="/register" class="nav-link register-link">Đăng Ký</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+
+    <main class="main-content">
+        {% if request.args.get('error') %}
+            <div class="alert alert-error" id="error-alert">
+                {{ request.args.get('error') }}
+            </div>
+        {% endif %}
+       
+        {% if error %}
+            <div class="alert alert-error" id="error-alert">
+                {{ error }}
+            </div>
+        {% endif %}
+
+
+        {% block content %}{% endblock %}
+    </main>
+    
+    {% if session.get('user') %} <div class="chat-widget-button" id="chat-widget-btn">
+        <span>🤖</span>
+    </div>
+    
+    <div class="chat-window" id="chat-window">
+        <div class="chat-header">
+            <h4>🤖 Trợ lý Ảo Metro</h4>
+            <span class="chat-close-btn" id="chat-close-btn">&times;</span>
+        </div>
+        <div class="chat-body" id="chat-body">
+            <div class="chat-message bot">
+                Chào bạn {{ session['user']['username'] }}! Tôi có thể giúp gì? <br>(Ví dụ: "giá vé từ Bến Thành đến Suối Tiên" hoặc "lịch tàu lúc 8h sáng mai")
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Nhập câu hỏi của bạn...">
+            <button id="chat-send-btn">Gửi</button>
+        </div>
+    </div>
+    {% endif %}
+    <footer>
+       
+        <div class="footer-container">
+
+
+            <div class="footer-column">
+                <h4>🚇 Metro FaceCheck</h4>
+                <p>Giải pháp check-in bằng khuôn mặt cho tuyến metro hiện đại, an toàn và nhanh chóng.</p>
+            </div>
+
+
+            <div class="footer-column">
+                <h4>Hệ thống</h4>
+                <ul>
+                    <li><a href="/">Trang chủ</a></li>
+                    <li><a href="/buy_ticket">Mua vé</a></li>
+                    <li><a href="/history">Lịch sử</a></li>
+                    <li><a href="/wallet">Ví điện tử</a></li>
+                </ul>
+            </div>
+
+
+            <div class="footer-column">
+                <h4>Hỗ trợ</h4>
+                <ul>
+                    <li><a href="#">Câu hỏi thường gặp</a></li>
+                    <li><a href="#">Hướng dẫn đăng ký</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                    <li><a href="#">Điều khoản sử dụng</a></li>
+                </ul>
+            </div>
+
+
+            <div class="footer-column">
+                <h4>Liên hệ</h4>
+                <p>📞 Hotline: 1900-999-888</p>
+                <p>✉️ Email: support@metroface.com</p>
+
+
+                <div class="social-icons">
+                    <a href="#"><span>🌐</span></a>
+                    <a href="#"><span>📘</span></a>
+                    <a href="#"><span>🐦</span></a>
+                    <a href="#"><span>📸</span></a>
+                </div>
+            </div>
+
+
+        </div>
+
+
+        <div class="footer-bottom">
+            © 2025 Metro FaceCheck — Thiết kế bởi nhóm sinh viên UTH 🧠✨
+        </div>
+    </footer>
+    <script>
+        // Auto-hide error alerts after 5 seconds
+        const errorAlert = document.getElementById('error-alert');
+        if (errorAlert) {
+            setTimeout(() => {
+                errorAlert.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+    
+    {% if session.get('user') %}
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+    {% endif %}
+</body>
+</html>

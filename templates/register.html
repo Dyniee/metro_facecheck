@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng Ký - Metro FaceCheck</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+  <style>
+    /* CSS MỚI: Tùy chọn Sinh viên */
+    .form-group-checkbox {
+      text-align: left;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .form-group-checkbox input[type="checkbox"] {
+      width: auto;
+      margin-right: 10px;
+      vertical-align: middle;
+      transform: scale(1.2);
+    }
+    .form-group-checkbox label {
+      display: inline-block;
+      font-weight: 600;
+      vertical-align: middle;
+      cursor: pointer;
+    }
+    .form-group-checkbox p {
+      font-size: 0.85rem;
+      color: #ddd;
+      margin-top: 5px;
+      padding-left: 28px; /* Căn lề với checkbox */
+    }
+    /* ---------------------------------- */
+
+    /* CSS CŨ (Sửa lại) - Gỡ bỏ nút Role */
+    .role-options { display: none; }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-overlay"></div>
+    <div class="auth-card">
+      <div class="auth-header">
+        <h2>Đăng Ký Tài Khoản</h2>
+        <p>Tạo tài khoản Metro FaceCheck để sử dụng dịch vụ</p>
+      </div>
+
+      {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+      {% endif %}
+
+      <form method="POST" class="auth-form">
+        <input type="hidden" name="role" value="user">
+
+        <div class="form-group">
+          <label for="username">Tên Đăng Nhập</label>
+          <input type="text" id="username" name="username" placeholder="Chọn tên đăng nhập" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Nhập email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Số Điện Thoại</label>
+          <input type="tel" id="phone" name="phone" placeholder="Nhập số điện thoại" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mật Khẩu</label>
+          <input type="password" id="password" name="password" placeholder="Mật khẩu tối thiểu 6 ký tự" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password_confirm">Xác Nhận Mật Khẩu</label>
+          <input type="password" id="password_confirm" name="password_confirm" placeholder="Nhập lại mật khẩu" required>
+        </div>
+
+        <div class="form-group-checkbox">
+          <input type="checkbox" id="is_student" name="is_student" value="true">
+          <label for="is_student">Tôi là học sinh / sinh viên</label>
+          <p>(Bạn sẽ được hưởng giá vé tháng ưu đãi 150.000 VNĐ)</p>
+        </div>
+        <button type="submit" class="btn-login">Đăng Ký</button>
+      </form>
+
+      <div class="auth-footer">
+        <p>Đã có tài khoản? <a href="/login">Đăng nhập</a></p>
+      </div>
+
+      <div class="back-home">
+        <a href="/" class="back-button">← Quay về trang chủ</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

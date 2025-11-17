@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiểm Soát Vào - Metro FaceCheck</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/checkin.css') }}">
+</head>
+<body>
+
+<div class="checkin-page-wrapper">
+
+    <svg style="display:none;" xmlns="http://www.w3.org/2000/svg">
+        <symbol id="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="1"></circle>
+            <circle cx="19" cy="12" r="1"></circle>
+            <circle cx="5" cy="12" r="1"></circle>
+        </symbol>
+        <symbol id="icon-pass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </symbol>
+        <symbol id="icon-deny" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </symbol>
+        <symbol id="icon-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </symbol>
+    </svg>
+
+    <div class="checkin-container">
+        <div class="camera-box">
+            <video id="video" autoplay muted playsinline></video>
+            <div id="camera-overlay">
+                <span class="overlay-text">🔍 Vui lòng mở mắt to và nhìn thẳng...</span>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h2>🚇 Check-In Metro</h2>
+            <p>Chọn ga và đưa khuôn mặt vào camera, sau đó **mở mắt to và nhìn thẳng** để xác thực.</p>
+
+            <div id="status" class="status-box status-idle">
+                <div class="status-icon">
+                    <svg><use href="#icon-idle"></use></svg>
+                </div>
+                <div class="status-text">
+                    <h4 id="status-title">Chưa Sẵn Sàng</h4>
+                    <p id="status-subtitle">Vui lòng chọn ga của bạn để bắt đầu.</p>
+                </div>
+            </div>
+
+            <label for="station">Chọn Ga</label>
+            <select id="station" class="station-select">
+                <option value="">-- Chọn ga --</option>
+                {% for station in stations %}
+                    <option value="{{ station.station_name }}">{{ station.station_name }}</option>
+                {% endfor %}
+            </select>
+           
+            <button id="start" class="btn-modern" disabled>Bắt đầu Check-in</button>
+        </div>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/camera_checkin.js') }}"></script>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">{% endblock %}
+
+{% block title %}Thông Báo - Metro FaceCheck{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h2>Thông Báo Vé Sắp Tới Giờ</h2>
+        <p>Đây là các vé lượt của bạn sắp đến giờ khởi hành.</p>
+    </div>
+
+    <div class="notification-list">
+        {% if upcoming_tickets %}
+            {% for ticket in upcoming_tickets %}
+            <div class="notification-card" data-departure-time="{{ ticket.expected_departure_time.isoformat() }}">
+                <div class="card-icon">🎟️</div>
+                <div class="card-content">
+                    <h4>{{ ticket.from_station_name }} → {{ ticket.to_station_name }}</h4>
+                    <p>
+                        Dự kiến khởi hành lúc: 
+                        <strong>{{ ticket.expected_departure_time.strftime('%H:%M ngày %d/%m/%Y') }}</strong>
+                    </p>
+                    <div class="countdown-timer" id="countdown-{{ ticket.id }}">
+                        </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🔕</div>
+            <h3>Không có thông báo</h3>
+            <p>Bạn không có vé lượt nào sắp khởi hành trong 24 giờ tới.</p>
+            <a href="/buy_ticket" class="btn btn-primary btn-lg">Mua Vé Ngay</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script data-current-time="{{ current_time_iso }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lấy thời gian hiện tại từ server (để tránh lệch múi giờ client)
+        const serverNow = new Date(document.querySelector('script[data-current-time]').dataset.currentTime);
+        const notificationCards = document.querySelectorAll('.notification-card');
+
+        function updateTimers() {
+            // Cập nhật thời gian hiện tại mỗi giây
+            serverNow.setSeconds(serverNow.getSeconds() + 1);
+            
+            notificationCards.forEach(card => {
+                const departureTime = new Date(card.dataset.departureTime);
+                const countdownEl = card.querySelector('.countdown-timer');
+                
+                // Tính toán thời gian chênh lệch (tính bằng giây)
+                const diffSeconds = Math.floor((departureTime - serverNow) / 1000);
+
+                if (diffSeconds <= 0) {
+                    countdownEl.className = 'countdown-timer expired';
+                    countdownEl.textContent = 'Đã đến giờ khởi hành';
+                    return;
+                }
+
+                // Tính toán giờ, phút, giây
+                const hours = Math.floor(diffSeconds / 3600);
+                const minutes = Math.floor((diffSeconds % 3600) / 60);
+                const seconds = diffSeconds % 60;
+
+                let message = `Còn: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // ✨ LOGIC NHẮC NHỞ 30 PHÚT ✨
+                if (diffSeconds <= 1800) { // Dưới 30 phút (1800 giây)
+                    countdownEl.className = 'countdown-timer urgent';
+                    countdownEl.textContent = `🚨 SẮP KHỞI HÀNH! (${message})`;
+                } else {
+                    countdownEl.className = 'countdown-timer normal';
+                    countdownEl.textContent = message;
+                }
+            });
+        }
+
+        if (notificationCards.length > 0) {
+            updateTimers(); // Chạy lần đầu
+            setInterval(updateTimers, 1000); // Cập nhật mỗi giây
+        }
+    });
+</script>
+{% endblock %}

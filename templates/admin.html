@@ -1,0 +1,942 @@
+{% extends "base.html" %} {% block title %}Admin - Metro FaceCheck{% endblock %}
+{% block extra_css %}
+<style>
+  .admin-container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f5f5f5;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: white;
+    border: 1px solid #f5f5f5;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #0066cc;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Định dạng số dư và giá vé */
+  .stat-value.revenue,
+  .balance-col,
+  .price-col {
+    font-size: 1.5rem; /* Giảm kích thước font cho số tiền */
+    color: #007a4a; /* Màu xanh lá cây cho tiền */
+  }
+  .balance-col {
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  .price-col {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #0052a3;
+  }
+
+
+  .stat-label {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #f5f5f5;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-weight: 600;
+    color: #666;
+    transition: all 0.3s ease;
+  }
+
+  .tab-btn:hover {
+    color: #0066cc;
+  }
+
+  .tab-btn.active {
+    color: #0066cc;
+    border-bottom-color: #0066cc;
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  .table-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .search-box {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #f5f5f5;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .action-btn {
+    padding: 0.75rem 1rem;
+    background: #ff3333;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+  }
+
+  .action-btn:hover {
+    background: #cc0000;
+  }
+
+  .action-btn.edit {
+    background: #0066cc;
+  }
+
+  .action-btn.edit:hover {
+    background: #0052a3;
+  }
+
+  .action-btn.add {
+    background: #00aa00;
+  }
+
+  .action-btn.add:hover {
+    background: #008800;
+  }
+
+  .empty-message {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    background: #f5f5f5;
+    border-radius: 0.75rem;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Thêm transition cho modal */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .modal.active {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    width: 90%;
+    max-width: 500px;
+    /* Thêm transition */
+    transform: translateY(-50px);
+    transition: transform 0.3s ease;
+  }
+
+  .modal.active .modal-content {
+      transform: translateY(0);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #f5f5f5;
+    padding-bottom: 1rem;
+  }
+
+  .modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  .modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .modal-form .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      text-align: left;
+  }
+  
+  .modal-form .form-group label {
+      font-weight: 600;
+      color: #333;
+  }
+
+  .modal-form input,
+  .modal-form select {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box; /* Quan trọng */
+  }
+
+  .modal-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .modal-buttons button {
+    flex: 1;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .modal-buttons .btn-primary {
+    background: #0066cc;
+    color: white;
+  }
+
+  .modal-buttons .btn-primary:hover {
+    background: #0052a3;
+  }
+
+  .modal-buttons .btn-secondary {
+    background: #f5f5f5;
+    color: #666;
+  }
+
+  .modal-buttons .btn-secondary:hover {
+    background: #e0e0e0;
+  }
+
+  .close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .close-btn:hover {
+    color: black;
+  }
+</style>
+{% endblock %} 
+
+{% block content %}
+<div class="admin-container">
+  <div class="admin-header">
+    <h1 style="font-size: 2rem; margin: 0">Bảng Điều Khiển Admin</h1>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value">{{ total_users }}</div>
+      <div class="stat-label">Tổng Người Dùng</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ total_tickets }}</div>
+      <div class="stat-label">Tổng Vé Bán</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ total_checkins }}</div>
+      <div class="stat-label">Lượt Kiểm Soát</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value revenue">{{ "{:,.0f}".format(total_revenue) }}</div>
+      <div class="stat-label">Doanh Thu (VNĐ)</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="users">Quản Lý Người Dùng</button>
+    <button class="tab-btn" data-tab="tickets">Quản Lý Vé</button>
+    <button class="tab-btn" data-tab="entry_logs">Lịch Sử Kiểm Soát</button>
+    <button class="tab-btn" data-tab="stations">Quản Lý Ga</button>
+  </div>
+
+  <div id="users" class="tab-content active">
+    <div class="table-controls">
+      <input
+        type="text"
+        class="search-box"
+        placeholder="Tìm kiếm theo tên người dùng..."
+        id="user-search"
+      />
+      <button class="btn btn-primary" onclick="exportUserData()">
+        Xuất Dữ Liệu
+      </button>
+    </div>
+
+    {% if users %}
+    <div class="table-container">
+      <table class="data-table" id="users-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tên Đăng Nhập</th>
+            <th>Email</th>
+            <th>Số Điện Thoại</th>
+            <th>Số Dư (VNĐ)</th> <th>Loại TK</th> <th>Đã ĐK Khuôn Mặt</th>
+            <th>Hành Động</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>{{ user.id }}</td>
+            <td><strong>{{ user.username }}</strong></td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.phone }}</td>
+            <td class="balance-col">{{ "{:,.0f}".format(user.balance or 0) }}</td>
+            <td>
+                {% if user.user_type == 'student' %}
+                    <span class="badge badge-secondary">Sinh viên</span>
+                {% else %}
+                    <span class="badge badge-primary">Thường</span>
+                {% endif %}
+            </td>
+            <td>
+              {% if user.face_registered == 1 %}
+              <span class="badge badge-success">Đã Đăng Ký</span>
+              {% else %}
+              <span class="badge badge-secondary">Chưa</span>
+              {% endif %}
+            </td>
+            <td>
+              <button
+                class="action-btn edit"
+                onclick="editUser(
+                    {{ user.id }}, 
+                    {{ user.username|tojson }}, 
+                    {{ user.email|tojson }}, 
+                    {{ user.phone|tojson }},
+                    {{ user.balance or 0 }},
+                    '{{ user.user_type }}'
+                )"
+              >
+                Sửa
+              </button>
+              <button
+                class="action-btn"
+                onclick="deleteUser({{ user.id }}, {{ user.username|tojson }})"
+              >
+                Xóa
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-message">
+      <p>Chưa có người dùng nào.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <div id="tickets" class="tab-content">
+    <div class="table-controls">
+      <input
+        type="text"
+        class="search-box"
+        placeholder="Tìm kiếm theo tên người dùng..."
+        id="ticket-search"
+      />
+      <button class="btn btn-primary" onclick="exportTicketData()">
+        Xuất Dữ Liệu
+      </button>
+    </div>
+
+    {% if tickets %}
+    <div class="table-container">
+      <table class="data-table" id="tickets-table">
+        <thead>
+          <tr>
+            <th>ID Vé</th>
+            <th>Người Dùng</th>
+            <th>Loại Vé</th> <th>Từ - Đến</th>
+            <th>Giá Vé (VNĐ)</th> <th>Hiệu Lực</th>
+            <th>Trạng Thái</th>
+            <th>Hành Động</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ticket in tickets %}
+          <tr>
+            <td>{{ ticket.id }}</td>
+            <td>{{ ticket.username or '-' }}</td>
+            <td>
+                {% if ticket.ticket_type == 'monthly' %}
+                    <span class="badge badge-primary">Vé Tháng</span>
+                {% else %}
+                    <span class="badge badge-secondary">Vé Lượt</span>
+                {% endif %}
+            </td>
+            <td>
+              {{ ticket.from_station_name or '-' }} → {{ ticket.to_station_name or '-' }}
+            </td>
+            <td class="price-col">
+                {{ "{:,.0f}".format(ticket.purchase_price) if ticket.purchase_price is not none else 'N/A' }}
+            </td>
+            <td>
+              {% if ticket.ticket_type == 'monthly' and ticket.valid_from %}
+                30 ngày (từ {{ ticket.valid_from.strftime('%d/%m') }})
+              {% elif ticket.ticket_type == 'single' and ticket.valid_from %}
+                Ngày {{ ticket.valid_from.strftime('%d/%m/%Y') }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td>
+              {% if ticket.status == 'NEW' and ticket.used == 0 %}
+              <span class="badge badge-primary">Mới</span>
+              {% elif ticket.status == 'USED' or ticket.used == 1 %}
+              <span class="badge badge-success">Đã Dùng</span>
+              {% else %}
+              <span class="badge badge-warning"
+                >{{ ticket.status or 'Không rõ' }}</span
+              >
+              {% endif %}
+            </td>
+            <td>
+              <button
+                class="action-btn"
+                onclick="deleteTicket({{ ticket.id }})"
+              >
+                Xóa
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-message">
+      <p>Chưa có vé nào.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <div id="entry_logs" class="tab-content">
+    <div class="table-controls">
+      <input
+        type="text"
+        class="search-box"
+        placeholder="Tìm kiếm theo tên người dùng..."
+        id="entry-search"
+      />
+      <button class="btn btn-primary" onclick="exportEntryLogData()">
+        Xuất Dữ Liệu
+      </button>
+    </div>
+
+    {% if entry_logs %}
+    <div class="table-container">
+      <table class="data-table" id="entry-logs-table">
+        <thead>
+          <tr>
+            <th>ID Log</th>
+            <th>Người Dùng</th>
+            <th>Ga Checkin</th>
+            <th>Thời Gian</th>
+            <th>Kết Quả</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in entry_logs %}
+          <tr>
+            <td>{{ log.log_id }}</td>
+            <td>{{ log.username or 'N/A' }}</td>
+            <td>{{ log.station_name or 'N/A' }}</td>
+            <td>
+              {{ log.timestamp.strftime('%d/%m/%Y %H:%M:%S') if log.timestamp
+              else '-' }}
+            </td>
+            <td>
+              {% if log.success == 1 %}
+              <span class="badge badge-success">Thành Công</span>
+              {% else %}
+              <span class="badge badge-warning">Thất Bại</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-message">
+      <p>Chưa có lịch sử kiểm soát nào.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <div id="stations" class="tab-content">
+    <div class="table-controls">
+      <input
+        type="text"
+        class="search-box"
+        placeholder="Tìm kiếm theo tên ga..."
+        id="station-search"
+      />
+      <button class="btn btn-primary" onclick="exportStationData()">
+        Xuất Dữ Liệu
+      </button>
+    </div>
+
+    {% if station_stats %}
+    <div class="table-container">
+      <table class="data-table" id="stations-table">
+        <thead>
+          <tr>
+            <th>Tên Ga</th>
+            <th>Tổng Lượt Check-in</th>
+            <th>Check-in Thành Công</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for station in station_stats %}
+          <tr>
+            <td><strong>{{ station.station_name }}</strong></td>
+            <td>{{ station.total_checkins }}</td>
+            <td
+              onclick="showStationCheckins('{{ station.station_name }}')"
+              style="cursor: pointer; color: #0066cc; font-weight: 600"
+              title="Nhấn để xem chi tiết"
+            >
+              {{ station.successful_checkins }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-message">
+      <p>Chưa có dữ liệu thống kê ga.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div id="editUserModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Sửa Thông Tin Người Dùng</h2>
+      <span class="close-btn" onclick="closeEditModal()">&times;</span>
+    </div>
+    <form class="modal-form" id="editUserForm">
+      <input type="hidden" id="editUserId" />
+      
+      <div class="form-group">
+        <label for="editUsername">Tên Đăng Nhập</label>
+        <input type="text" id="editUsername" required />
+      </div>
+      
+      <div class="form-group">
+        <label for="editEmail">Email</label>
+        <input type="email" id="editEmail" required />
+      </div>
+      
+      <div class="form-group">
+        <label for="editPhone">Số Điện Thoại</label>
+        <input type="tel" id="editPhone" />
+      </div>
+      
+      <div class="form-group">
+        <label for="editBalance">Số Dư (VNĐ)</label>
+        <input type="number" id="editBalance" />
+      </div>
+      
+      <div class="form-group">
+        <label for="editUserType">Loại Tài Khoản</label>
+        <select id="editUserType">
+            <option value="general">Thường (general)</option>
+            <option value="student">Sinh viên (student)</option>
+        </select>
+      </div>
+      
+      <div class="modal-buttons">
+        <button type="button" class="btn-secondary" onclick="closeEditModal()">
+          Hủy
+        </button>
+        <button type="submit" class="btn-primary">Lưu Thay Đổi</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="stationCheckinModal" class="modal">
+  <div class="modal-content" style="max-width: 800px">
+    <div class="modal-header">
+      <h2 id="stationModalTitle">Lịch Sử Check-in</h2>
+      <span class="close-btn" onclick="closeStationModal()">&times;</span>
+    </div>
+    <div class="modal-body" style="max-height: 60vh; overflow-y: auto">
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID Log</th>
+              <th>Tên Người Dùng</th>
+              <th>Mã Vé (Trip Code)</th>
+              <th>Thời Gian Check-in</th>
+            </tr>
+          </thead>
+          <tbody id="stationCheckinTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-buttons" style="margin-top: 1rem">
+      <button type="button" class="btn-secondary" onclick="closeStationModal()">
+        Đóng
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Tab switching
+  document.querySelectorAll(".tab-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      document
+        .querySelectorAll(".tab-btn")
+        .forEach((b) => b.classList.remove("active"));
+      document
+        .querySelectorAll(".tab-content")
+        .forEach((c) => c.classList.remove("active"));
+
+      this.classList.add("active");
+      document.getElementById(this.dataset.tab).classList.add("active");
+    });
+  });
+
+  // ========================
+  // CẬP NHẬT: JAVASCRIPT SỬA USER
+  // ========================
+
+  // Cập nhật hàm editUser để nhận thêm tham số
+  function editUser(userId, username, email, phone, balance, userType) {
+    document.getElementById("editUserId").value = userId;
+    document.getElementById("editUsername").value = username;
+    document.getElementById("editEmail").value = email;
+    document.getElementById("editPhone").value = phone;
+    document.getElementById("editBalance").value = balance; // THÊM MỚI
+    document.getElementById("editUserType").value = userType; // THÊM MỚI
+    document.getElementById("editUserModal").classList.add("active");
+  }
+
+  function closeEditModal() {
+    document.getElementById("editUserModal").classList.remove("active");
+  }
+
+  // Cập nhật hàm submit form
+  document
+    .getElementById("editUserForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const userId = document.getElementById("editUserId").value;
+      const username = document.getElementById("editUsername").value;
+      const email = document.getElementById("editEmail").value;
+      const phone = document.getElementById("editPhone").value;
+      const balance = document.getElementById("editBalance").value; // THÊM MỚI
+      const userType = document.getElementById("editUserType").value; // THÊM MỚI
+
+      try {
+        const response = await fetch(`/api/admin/user/${userId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          // THÊM MỚI: Gửi balance và user_type lên server
+          body: JSON.stringify({ 
+              username, 
+              email, 
+              phone, 
+              balance, 
+              user_type: userType // (tên key là 'user_type' để khớp với app.py)
+          }),
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          alert(result.message);
+          closeEditModal();
+          location.reload(); // Tải lại trang để thấy thay đổi
+        } else {
+          alert("Lỗi: " + result.error);
+        }
+      } catch (error) {
+        alert("Lỗi cập nhật người dùng: " + error.message);
+      }
+    });
+
+  // ========================
+  // (JavaScript còn lại giữ nguyên)
+  // ========================
+
+  // Delete user
+  async function deleteUser(userId, username) {
+    if (!confirm(`Bạn chắc chắn muốn xóa người dùng "${username}"?`)) return;
+
+    try {
+      const response = await fetch(`/api/admin/user/${userId}`, {
+        method: "DELETE",
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        alert(result.message);
+        location.reload();
+      } else {
+        alert("Lỗi: " + result.error);
+      }
+    } catch (error) {
+      alert("Lỗi xóa người dùng: " + error.message);
+    }
+  }
+
+  // Delete ticket
+  async function deleteTicket(ticketId) {
+    if (!confirm("Bạn chắc chắn muốn xóa vé này?")) return;
+
+    try {
+      const response = await fetch(`/api/admin/ticket/${ticketId}`, {
+        method: "DELETE",
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        alert(result.message);
+        location.reload();
+      } else {
+        alert("Lỗi: " + result.error);
+      }
+    } catch (error) {
+      alert("Lỗi xóa vé: " + error.message);
+    }
+  }
+
+  /* ✨ JAVASCRIPT CHO MODAL GA ✨ */
+  const stationModal = document.getElementById("stationCheckinModal");
+  const stationModalTitle = document.getElementById("stationModalTitle");
+  const stationTbody = document.getElementById("stationCheckinTbody");
+
+  async function showStationCheckins(stationName) {
+    stationModalTitle.innerText = `Check-in Thành Công: ${stationName}`;
+    stationModal.classList.add("active");
+    stationTbody.innerHTML = '<tr><td colspan="4">Đang tải...</td></tr>';
+
+    try {
+      const encodedName = encodeURIComponent(stationName);
+      const response = await fetch(
+        `/api/admin/station_checkins/${encodedName}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Lỗi máy chủ: " + response.statusText);
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        stationTbody.innerHTML = "";
+        if (result.checkins.length > 0) {
+          result.checkins.forEach((log) => {
+            const row = `
+                            <tr>
+                                <td>${log.log_id}</td>
+                                <td>${log.username || "N/A"}</td>
+                                <td><code>${log.trip_code || "N/A"}</code></td>
+                                <td>${log.checkin_time}</td>
+                            </tr>
+                        `;
+            stationTbody.innerHTML += row;
+          });
+        } else {
+          stationTbody.innerHTML =
+            '<tr><td colspan="4" style="text-align: center;">Không có lượt check-in thành công nào.</td></tr>';
+        }
+      } else {
+        throw new Error(result.error || "Không thể tải dữ liệu");
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải dữ liệu check-in:", error);
+      stationTbody.innerHTML = `<tr><td colspan="4" style="color: red; text-align: center;">Lỗi: ${error.message}</td></tr>`;
+    }
+  }
+
+  function closeStationModal() {
+    stationModal.classList.remove("active");
+  }
+
+  // Search functions
+  document
+    .getElementById("user-search")
+    .addEventListener("keyup", function (e) {
+      const query = e.target.value.toLowerCase();
+      document.querySelectorAll("#users-table tbody tr").forEach((row) => {
+        const username = row.cells[1].textContent.toLowerCase();
+        row.style.display = username.includes(query) ? "" : "none";
+      });
+    });
+
+  document
+    .getElementById("ticket-search")
+    .addEventListener("keyup", function (e) {
+      const query = e.target.value.toLowerCase();
+      document.querySelectorAll("#tickets-table tbody tr").forEach((row) => {
+        const user = row.cells[1].textContent.toLowerCase();
+        row.style.display = user.includes(query) ? "" : "none";
+      });
+    });
+
+  document
+    .getElementById("entry-search")
+    .addEventListener("keyup", function (e) {
+      const query = e.target.value.toLowerCase();
+      document.querySelectorAll("#entry-logs-table tbody tr").forEach((row) => {
+        const user = row.cells[1].textContent.toLowerCase();
+        row.style.display = user.includes(query) ? "" : "none";
+      });
+    });
+
+  document
+    .getElementById("station-search")
+    .addEventListener("keyup", function (e) {
+      const query = e.target.value.toLowerCase();
+      document.querySelectorAll("#stations-table tbody tr").forEach((row) => {
+        const stationName = row.cells[0].textContent.toLowerCase();
+        row.style.display = stationName.includes(query) ? "" : "none";
+      });
+    });
+
+  // Export functions
+  function exportUserData() {
+    const table = document.getElementById("users-table");
+    exportTableToCSV("users.csv", table);
+  }
+
+  function exportTicketData() {
+    const table = document.getElementById("tickets-table");
+    exportTableToCSV("tickets.csv", table);
+  }
+
+  function exportEntryLogData() {
+    const table = document.getElementById("entry-logs-table");
+    exportTableToCSV("entry_logs.csv", table);
+  }
+
+  function exportStationData() {
+    const table = document.getElementById("stations-table");
+    exportTableToCSV("station_stats.csv", table);
+  }
+
+  function exportTableToCSV(filename, table) {
+    let csv = [];
+    let rows = table.querySelectorAll("tr");
+
+    for (let i = 0; i < rows.length; i++) {
+      let row = [];
+      let cols = rows[i].querySelectorAll("td, th");
+      
+      // Bỏ qua cột cuối cùng (Hành Động)
+      let colCount = cols.length - 1;
+
+      for (let j = 0; j < colCount; j++) {
+        let cellText = cols[j].innerText.replace(/"/g, '""');
+        if (cols[j].querySelector(".badge")) {
+          cellText = cols[j].querySelector(".badge").innerText;
+        }
+        cellText = cellText.replace(/\n/g, " ").replace(/,/g, ""); // Xóa dấu phẩy khỏi số tiền
+        row.push('"' + cellText + '"');
+      }
+
+      csv.push(row.join(","));
+    }
+
+    const csvFile = new Blob(["\uFEFF" + csv.join("\n")], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const downloadLink = document.createElement("a");
+    downloadLink.href = URL.createObjectURL(csvFile);
+    downloadLink.download = filename;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  }
+
+  // Close modal when clicking outside
+  window.onclick = function (event) {
+    const editModal = document.getElementById("editUserModal");
+    const stationModal = document.getElementById("stationCheckinModal");
+
+    if (event.target == editModal) {
+      editModal.classList.remove("active");
+    }
+    if (event.target == stationModal) {
+      stationModal.classList.remove("active");
+    }
+  };
+</script>
+{% endblock %}
